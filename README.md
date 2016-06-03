@@ -32,15 +32,22 @@ Output is a JSON file and its schema is
 
 ```json
 {
-  "url": "the given url",
+  "id": "the video ID.",
+  "channel":{
+    "id": "ID of the channel the video belongs to.",
+    "name" : "the channel name."
+  },
   "comments": [
     {
-      "root": "root comment",
-      "like": "like score (summation of +1 for like and -1 for dislike)",
+      "root": "root comment.",
+      "author": "author of the root comment.",
+      "like": "like score (summation of +1 for like and -1 for dislike).",
       "children": [
         {
-          "comment": "reply comment",
-          "like": "like score"
+          "comment": "reply comment.",
+          "author": "author of the reply comment.",
+          "like": "like score.",
+          "receiver": "receiver name if the comment is a reply for a specific user."
         },
         ...
       ]
@@ -57,21 +64,38 @@ Method
 var scraper = require("youtube-comment-scraper");
 ```
 
-### `scraper(url)`
+### `scraper.comments(url)`
 Scraping a given Youtube page and return a set of comments.
 
 - Args:
   - url: URL of the target page or video ID.
 - Returns:
- Promise object. Use "then" to recieve results.
+ Promise object. Use "then" to receive results.
+
+### `scraper.channel(url)`
+Scraping a Youtube channel page and return a description of the channel.
+
+- Args:
+  - id: channel ID.
+- Returns:
+  Promise object. Use "then" method to receive results.
+
+### `scraper.close()`
+Cleanup this module. After all scrapings have done, this method should be called.
+Otherwise, some instances of PhantomJS will keep running and it prevents
+finishing main process.
 
 ### example
 ```js
-scraper(some_url).then(function(res) {
-  return console.log(JSON.stringify({
+scraper.comments(some_url).then(function(res) {
+  // Printing the result.
+  console.log(JSON.stringify({
     url: some_url,
     comments: res
   }));
+
+  // Close scraper.
+  scraper.close();
 });
 ```
 
